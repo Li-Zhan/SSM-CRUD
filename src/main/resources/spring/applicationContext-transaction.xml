@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+	   xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">    
+
+        <!-- 使用声明式事务管理 (可以规范业务层方法名)-->
+        
+        <!-- 1.配置事务管理器 -->
+        <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+          <!-- 注入dataSource -->
+          <property name="dataSource" ref="dataSource"></property>
+        </bean>
+        
+        <!-- 配置通知 -->
+        <tx:advice id="txAdvice">
+          <tx:attributes>
+          <!-- 匹配业务类中的方法 -->
+            <tx:method name="save*" propagation="REQUIRED"/>
+            <tx:method name="insert*" propagation="REQUIRED"/>
+            <tx:method name="update*" propagation="REQUIRED"/>
+            <tx:method name="delete*" propagation="REQUIRED"/>
+            <tx:method name="find*" propagation="SUPPORTS" read-only="true"/>
+            <tx:method name="select*" propagation="SUPPORTS" read-only="true"/>
+            <tx:method name="get*" propagation="SUPPORTS" read-only="true"/>
+          </tx:attributes>
+        </tx:advice>
+        
+        <!-- 配置aop -->
+        <aop:config>
+          <!-- 配置切点 -->
+          <aop:pointcut expression="execution(* cn.lynu.service.*.*(..))" id="cut"/>
+          <!-- 配置切面 -->
+          <aop:advisor advice-ref="txAdvice" pointcut-ref="cut"/>
+        </aop:config>
+
+</beans>
